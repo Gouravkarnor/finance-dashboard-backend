@@ -4,7 +4,7 @@ import {
   createRecord,
   deleteRecord,
   getRecords,
-  updateRecord
+  updateRecord,
 } from "../controllers/record.controller";
 import { getSummary } from "../controllers/dashboard.controller";
 import { auth } from "../middleware/auth.middleware";
@@ -12,7 +12,7 @@ import { allowRoles } from "../middleware/role.middleware";
 import {
   getUsers,
   updateUserRole,
-  updateUserStatus
+  updateUserStatus,
 } from "../controllers/user.controller";
 
 const router = Router();
@@ -115,6 +115,45 @@ router.post("/auth/login", login);
  *     tags: [Records]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: Number of records per page
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [income, expense]
+ *         description: Filter by record type
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *           example: Food
+ *         description: Filter by category
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: 2025-01-01
+ *         description: Filter records from this date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *           example: 2025-12-31
+ *         description: Filter records till this date
  *     responses:
  *       200:
  *         description: List of records
@@ -123,19 +162,30 @@ router.post("/auth/login", login);
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
  *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Record'
- *                 total:
- *                   type: number
- *                 page:
- *                   type: number
- *                 limit:
- *                   type: number
+ *                   type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Record'
+ *                     total:
+ *                       type: number
+ *                     page:
+ *                       type: number
+ *                     limit:
+ *                       type: number
  */
-router.get("/records", auth, allowRoles("admin", "analyst", "viewer"), getRecords);
-
+router.get(
+  "/records",
+  auth,
+  allowRoles("admin", "analyst", "viewer"),
+  getRecords,
+);
 /**
  * @swagger
  * /records:
@@ -144,13 +194,25 @@ router.get("/records", auth, allowRoles("admin", "analyst", "viewer"), getRecord
  *     tags: [Records]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RecordInput'
  *     responses:
- *       200:
- *         description: Record created
+ *       201:
+ *         description: Record created successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Record'
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (Admin only)
  */
 router.post("/records", auth, allowRoles("admin"), createRecord);
 /**
@@ -213,7 +275,12 @@ router.delete("/records/:id", auth, allowRoles("admin"), deleteRecord);
  *             schema:
  *               type: object
  */
-router.get("/dashboard", auth, getSummary);
+router.get(
+  "/dashboard",
+  auth,
+  allowRoles("admin", "analyst", "viewer"),
+  getSummary,
+);
 
 /**
  * @swagger

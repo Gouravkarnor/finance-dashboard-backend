@@ -8,7 +8,7 @@ export const registerUser = async (data: any) => {
 
   const hash = await bcrypt.hash(data.password, 10);
   return User.create({ ...data, password: hash });
-};;
+};
 
 export const loginUser = async (data: any) => {
   const user = await User.findOne({ email: data.email }).select("+password");
@@ -20,9 +20,18 @@ export const loginUser = async (data: any) => {
   const isMatch = await bcrypt.compare(data.password, user.password);
   if (!isMatch) throw new Error("Invalid password");
 
-  return jwt.sign(
+  const token = jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET as string,
-    { expiresIn: "1d" } // 🔥 add expiry
+    { expiresIn: "1d" },
   );
+
+  // ✅ remove password before returning
+  const userObj = user.toObject();
+  const { password, ...safeUser } = userObj;
+
+  return {
+    token,
+    user: safeUser,
+  };
 };

@@ -7,24 +7,29 @@ export const getSummary = async () => {
   const categoryMap: any = {};
   const monthlyMap: any = {};
 
-  records.forEach((r: any) => {
-    // totals
-    if (r.type === "income") income += r.amount;
-    else expense += r.amount;
+ records.forEach((r: any) => {
+  // totals
+  if (r.type === "income") income += r.amount;
+  else expense += r.amount;
 
-    // category breakdown
-    if (!categoryMap[r.category]) {
-      categoryMap[r.category] = 0;
-    }
-    categoryMap[r.category] += r.amount;
+  // category
+  if (!categoryMap[r.category]) {
+    categoryMap[r.category] = 0;
+  }
+  categoryMap[r.category] += r.amount;
 
-    // monthly trends
-    const month = new Date(r.date).toISOString().slice(0, 7);
-    if (!monthlyMap[month]) {
-      monthlyMap[month] = 0;
+  // ✅ SAFE date handling
+  if (r.date) {
+    const d = new Date(r.date);
+    if (!isNaN(d.getTime())) {
+      const month = d.toISOString().slice(0, 7);
+      if (!monthlyMap[month]) {
+        monthlyMap[month] = 0;
+      }
+      monthlyMap[month] += r.amount;
     }
-    monthlyMap[month] += r.amount;
-  });
+  }
+});
 
   const recent = await Record.find()
     .sort({ createdAt: -1 })
