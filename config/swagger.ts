@@ -10,7 +10,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:5000/api"
+        url: "https://finance-dashboard-backend-bcg3.onrender.com/api"
       }
     ],
     components: {
