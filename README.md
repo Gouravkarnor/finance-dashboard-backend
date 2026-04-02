@@ -7,11 +7,11 @@ Built with **Node.js, Express, MongoDB, and Swagger**.
 
 ## 🚀 Live API
 
-Base URL : https://finance-dashboard-backend-bcg3.onrender.com
+- **Base URL:**  
+  https://finance-dashboard-backend-bcg3.onrender.com  
 
-
-Swagger Docs : https://finance-dashboard-backend-bcg3.onrender.com/api-docs
-
+- **Swagger Docs:**  
+  https://finance-dashboard-backend-bcg3.onrender.com/api-docs  
 
 ---
 
